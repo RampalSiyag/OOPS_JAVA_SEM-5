@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Issue a book')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav('loans')}"></header>
+
+<main class="container narrow">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="page-head">
+        <h1>Issue a book</h1>
+    </div>
+
+    <form class="card form" th:action="@{/loans/issue}" method="post">
+        <label>Book
+            <select name="bookId" required>
+                <option value="">Choose a book</option>
+                <option th:each="book : ${books}"
+                        th:value="${book.id}"
+                        th:selected="${selectedBookId != null and selectedBookId == book.id}"
+                        th:text="${book.title} + ' — ' + ${book.author} + ' (' + ${book.availableCopies} + ' available)'">
+                    Title
+                </option>
+            </select>
+        </label>
+
+        <label>Member
+            <select name="memberId" required>
+                <option value="">Choose a member</option>
+                <option th:each="member : ${members}"
+                        th:value="${member.id}"
+                        th:text="${member.name} + ' (' + ${member.email} + ')'">
+                    Member
+                </option>
+            </select>
+        </label>
+
+        <p class="note">
+            Books are lent for <strong th:text="${loanDays}">14</strong> days.
+            Late returns are charged <strong th:text="'₹' + ${finePerDay}">₹5</strong> per day.
+            A member can hold up to <strong th:text="${maxLoans}">3</strong> books and cannot borrow while
+            another book is overdue.
+        </p>
+
+        <div class="form-actions">
+            <button class="btn primary" type="submit">Issue book</button>
+            <a class="btn ghost" th:href="@{/loans}">Cancel</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

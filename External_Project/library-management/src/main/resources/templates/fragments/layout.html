@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' · Library'">Library</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header th:fragment="nav(active)" class="topbar">
+    <div class="topbar-inner">
+        <a th:href="@{/}" class="brand">Pustakalaya <span>library desk</span></a>
+        <nav>
+            <a th:href="@{/}" th:classappend="${active == 'home'} ? 'active'">Dashboard</a>
+            <a th:href="@{/books}" th:classappend="${active == 'books'} ? 'active'">Books</a>
+            <a th:href="@{/members}" th:classappend="${active == 'members'} ? 'active'">Members</a>
+            <a th:href="@{/loans}" th:classappend="${active == 'loans'} ? 'active'">Loans</a>
+        </nav>
+    </div>
+</header>
+
+<div th:fragment="flash">
+    <div th:if="${success}" class="alert success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert error" th:text="${error}"></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Members')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav('members')}"></header>
+
+<main class="container">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="page-head">
+        <h1>Members</h1>
+        <div class="actions">
+            <a class="btn primary" th:href="@{/members/new}">Add member</a>
+        </div>
+    </div>
+
+    <form class="search" th:action="@{/members}" method="get">
+        <input type="search" name="q" th:value="${q}" placeholder="Search by name or email">
+        <button class="btn" type="submit">Search</button>
+        <a class="btn ghost" th:if="${q != null and !q.isBlank()}" th:href="@{/members}">Clear</a>
+    </form>
+
+    <section class="card">
+        <p class="empty" th:if="${#lists.isEmpty(members)}">No members found.</p>
+        <table th:unless="${#lists.isEmpty(members)}">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Joined</th>
+                <th>Books out</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="member : ${members}">
+                <td class="strong" th:text="${member.name}">Name</td>
+                <td th:text="${member.email}">email</td>
+                <td th:text="${member.phone}">phone</td>
+                <td th:text="${#temporals.format(member.joinedOn, 'dd MMM yyyy')}">01 Jan 2026</td>
+                <td>
+                    <span class="badge" th:classappend="${activeLoans[member.id] >= maxLoans} ? 'danger' : 'ok'"
+                          th:text="${activeLoans[member.id]} + ' / ' + ${maxLoans}">0 / 3</span>
+                </td>
+                <td class="right row-actions">
+                    <a class="btn small ghost" th:href="@{/members/{id}/edit(id=${member.id})}">Edit</a>
+                    <form th:action="@{/members/{id}/delete(id=${member.id})}" method="post"
+                          onsubmit="return confirm('Remove this member?');">
+                        <button class="btn small danger-btn" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

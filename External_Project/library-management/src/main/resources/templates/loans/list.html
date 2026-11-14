@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Loans')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav('loans')}"></header>
+
+<main class="container">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="page-head">
+        <h1>Loans</h1>
+        <div class="actions">
+            <a class="btn primary" th:href="@{/loans/issue}">Issue a book</a>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <a th:href="@{/loans(filter='active')}" th:classappend="${filter == 'active'} ? 'active'">On loan</a>
+        <a th:href="@{/loans(filter='overdue')}" th:classappend="${filter == 'overdue'} ? 'active'">Overdue</a>
+        <a th:href="@{/loans(filter='all')}" th:classappend="${filter == 'all'} ? 'active'">All history</a>
+    </div>
+
+    <section class="card">
+        <p class="empty" th:if="${#lists.isEmpty(loans)}">No loans to show here.</p>
+        <table th:unless="${#lists.isEmpty(loans)}">
+            <thead>
+            <tr>
+                <th>Book</th>
+                <th>Member</th>
+                <th>Issued</th>
+                <th>Due</th>
+                <th>Returned</th>
+                <th>Status</th>
+                <th>Fine</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="loan : ${loans}">
+                <td class="strong" th:text="${loan.book.title}">Title</td>
+                <td th:text="${loan.member.name}">Member</td>
+                <td th:text="${#temporals.format(loan.issueDate, 'dd MMM yyyy')}">01 Jan 2026</td>
+                <td th:text="${#temporals.format(loan.dueDate, 'dd MMM yyyy')}">15 Jan 2026</td>
+                <td th:text="${loan.returned} ? ${#temporals.format(loan.returnDate, 'dd MMM yyyy')} : '—'">—</td>
+                <td>
+                    <span th:if="${loan.returned}" class="badge muted">Returned</span>
+                    <span th:if="${!loan.returned and loan.overdue}" class="badge danger">Overdue</span>
+                    <span th:if="${!loan.returned and !loan.overdue}" class="badge ok">On loan</span>
+                </td>
+                <td th:text="${loan.currentFine > 0} ? '₹' + ${loan.currentFine} : '—'">—</td>
+                <td class="right">
+                    <form th:unless="${loan.returned}"
+                          th:action="@{/loans/{id}/return(id=${loan.id})}" method="post">
+                        <input type="hidden" name="filter" th:value="${filter}">
+                        <button class="btn small" type="submit">Mark returned</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

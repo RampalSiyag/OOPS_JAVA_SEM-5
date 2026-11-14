@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav('home')}"></header>
+
+<main class="container">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="page-head">
+        <h1>Dashboard</h1>
+        <div class="actions">
+            <a class="btn primary" th:href="@{/loans/issue}">Issue a book</a>
+        </div>
+    </div>
+
+    <section class="stats">
+        <div class="stat">
+            <span class="stat-num" th:text="${titles}">0</span>
+            <span class="stat-label">Book titles</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num" th:text="${availableCopies}">0</span>
+            <span class="stat-label">Copies on the shelf</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num" th:text="${members}">0</span>
+            <span class="stat-label">Members</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num" th:text="${activeLoans}">0</span>
+            <span class="stat-label">Books on loan</span>
+        </div>
+        <div class="stat" th:classappend="${overdueLoans > 0} ? 'alert-stat'">
+            <span class="stat-num" th:text="${overdueLoans}">0</span>
+            <span class="stat-label">Overdue</span>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Overdue books</h2>
+        <p class="empty" th:if="${#lists.isEmpty(overdueList)}">Nothing is overdue. Everyone is on time.</p>
+        <table th:unless="${#lists.isEmpty(overdueList)}">
+            <thead>
+            <tr>
+                <th>Book</th>
+                <th>Member</th>
+                <th>Due date</th>
+                <th>Days late</th>
+                <th>Fine so far</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="loan : ${overdueList}">
+                <td th:text="${loan.book.title}">Title</td>
+                <td th:text="${loan.member.name}">Member</td>
+                <td th:text="${#temporals.format(loan.dueDate, 'dd MMM yyyy')}">01 Jan 2026</td>
+                <td><span class="badge danger" th:text="${loan.overdueDays} + ' days'">3 days</span></td>
+                <td th:text="'₹' + ${loan.currentFine}">₹0</td>
+                <td class="right">
+                    <form th:action="@{/loans/{id}/return(id=${loan.id})}" method="post">
+                        <button class="btn small" type="submit">Mark returned</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

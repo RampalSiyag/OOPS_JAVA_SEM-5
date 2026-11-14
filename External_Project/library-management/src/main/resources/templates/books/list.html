@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Books')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: nav('books')}"></header>
+
+<main class="container">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="page-head">
+        <h1>Books</h1>
+        <div class="actions">
+            <a class="btn primary" th:href="@{/books/new}">Add book</a>
+        </div>
+    </div>
+
+    <form class="search" th:action="@{/books}" method="get">
+        <input type="search" name="q" th:value="${q}" placeholder="Search by title, author, ISBN or category">
+        <button class="btn" type="submit">Search</button>
+        <a class="btn ghost" th:if="${q != null and !q.isBlank()}" th:href="@{/books}">Clear</a>
+    </form>
+
+    <section class="card">
+        <p class="empty" th:if="${#lists.isEmpty(books)}">No books found.</p>
+        <table th:unless="${#lists.isEmpty(books)}">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Category</th>
+                <th>Available</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}">
+                <td class="strong" th:text="${book.title}">Title</td>
+                <td th:text="${book.author}">Author</td>
+                <td class="mono" th:text="${book.isbn}">ISBN</td>
+                <td th:text="${book.category}">Category</td>
+                <td>
+                    <span class="badge" th:classappend="${book.availableCopies > 0} ? 'ok' : 'danger'"
+                          th:text="${book.availableCopies} + ' / ' + ${book.totalCopies}">1 / 1</span>
+                </td>
+                <td class="right row-actions">
+                    <a class="btn small" th:if="${book.availableCopies > 0}"
+                       th:href="@{/loans/issue(bookId=${book.id})}">Issue</a>
+                    <a class="btn small ghost" th:href="@{/books/{id}/edit(id=${book.id})}">Edit</a>
+                    <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post"
+                          onsubmit="return confirm('Delete this book?');">
+                        <button class="btn small danger-btn" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>
